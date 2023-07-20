@@ -2,23 +2,82 @@
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
 $(function () {
-    // TODO: Add a listener for click events on the save button. This code should
-    // use the id in the containing time-block as a key to save the user input in
-    // local storage. HINT: What does `this` reference in the click listener
-    // function? How can DOM traversal be used to get the "hour-x" id of the
-    // time-block containing the button that was clicked? How might the id be
-    // useful when saving the description in local storage?
-    //
-    // TODO: Add code to apply the past, present, or future class to each time
-    // block by comparing the id to the current hour. HINTS: How can the id
-    // attribute of each time-block be used to conditionally add or remove the
-    // past, present, and future classes? How can Day.js be used to get the
-    // current hour in 24-hour time?
-    //
-    // TODO: Add code to get any user input that was saved in localStorage and set
-    // the values of the corresponding textarea elements. HINT: How can the id
-    // attribute of each time-block be used to do this?
-    //
-    // TODO: Add code to display the current date in the header of the page.
+
+  // Select the save buttons using the class selector '.saveBtn'
+  let saveBtn = $('.saveBtn');
+
+  // Select the reset button using the ID selector '#resetBtn'
+  let resetBtn = $('#resetBtn'); 
+
+  // Load any saved events from local storage for each hour (9 am to 5 pm)
+  // using a for loop from hour 9 to 17 (5 pm is represented as 17 in 24-hour format).
+  for (let hour = 9; hour <= 17; hour++) {
+
+    // Create the time block ID for each hour, e.g., 'hour-9', 'hour-10', etc.
+    let timeBlockId = `hour-${hour}`;
+
+    // Select the textarea element within the corresponding time block using the ID.
+    let descriptionElement = $(`#${timeBlockId} .description`);
+
+    // Retrieve any saved event for this hour from local storage using the time block ID.
+    let savedEvent = localStorage.getItem(timeBlockId);
+
+    // If there's a saved event, set the value of the textarea to display it.
+    if (savedEvent) {
+      descriptionElement.val(savedEvent);
+    }
+  }
+
+  // Display the current date in the header using the dayjs library.
+  $('#currentDay').text(dayjs().format('dddd, MMMM D, YYYY'));
+
+  // Update time block colors based on the current hour using a function.
+  function updateHourColors() {
+
+    // Get the current hour in 24-hour format using the dayjs library.
+    let currentHour = dayjs().hour();
+
+    // Loop through each time block using the jQuery each() function.
+    $('.time-block').each(function () {
+
+      // Extract the hour from the time block ID, e.g., 'hour-9' -> 9.
+      let hour = parseInt($(this).attr('id').split('-')[1]);
+
+      // Compare the hour with the current hour to set appropriate classes
+      // for past, present, and future time blocks.
+      if (hour < currentHour) {
+        $(this).removeClass('present future').addClass('past');
+      } else if (hour === currentHour) {
+        $(this).removeClass('past future').addClass('present');
+      } else {
+        $(this).removeClass('past present').addClass('future');
+      }
+    });
+  }
+
+  // Call the function to update time block colors.
+  updateHourColors();
+
+  // Event listener for save buttons
+  saveBtn.on('click', function () {
+
+    // Get the ID of the parent time block containing the clicked save button.
+    let timeBlockId = $(this).parent().attr('id');
+
+    // Get the user input (description) from the sibling textarea element.
+    let userInput = $(this).siblings('.description').val();
+
+    // Store the user input (description) in local storage with the time block ID as the key.
+    localStorage.setItem(timeBlockId, userInput);
   });
-  
+
+  // Event listener for reset button
+  resetBtn.on('click', function () {
+
+    // Clear user inputs from all the textareas by setting their value to an empty string.
+    $('.description').val('');
+
+    // Remove all saved events from local storage by calling the clear() method.
+    localStorage.clear();
+  });
+});
