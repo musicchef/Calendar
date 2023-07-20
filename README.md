@@ -27,9 +27,8 @@ THEN the saved events persist
 ```
 ## Deployment
 
-```md
+
 The site is live at https://musicchef.github.io/Calendar/
 
 ![image](https://github.com/musicchef/Calendar/assets/135558356/b2377279-b4ee-44d6-8945-ffb34acbe827)
-```
 
